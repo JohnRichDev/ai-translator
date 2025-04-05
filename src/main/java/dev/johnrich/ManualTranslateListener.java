@@ -34,13 +34,9 @@ public class ManualTranslateListener implements ClientModInitializer {
 
         System.out.println("[Translator] Translator listener initialized");
 
-        // Intercept all incoming chat messages.
+        // Intercept all incoming messages.
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
             MinecraftClient client = MinecraftClient.getInstance();
-
-            if (sender.getId().equals(client.player.getUuid())) {
-                return true;
-            }
 
             String originalMessage = message.getString();
             UUID messageId = UUID.randomUUID();
@@ -49,18 +45,32 @@ public class ManualTranslateListener implements ClientModInitializer {
                 messageCache.remove(messageCache.keySet().iterator().next());
             }
 
-            MutableText translateButton = Text.literal(" [T]")
+            MutableText translateButton = Text.literal(" §r[T]")
                     .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
                             .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
                             .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
             MutableText modifiedMessage = Text.empty().append(message).append(translateButton);
+            client.inGameHud.getChatHud().addMessage(modifiedMessage);
 
-            client.execute(() -> {
-                if (client.inGameHud != null) {
-                    client.inGameHud.getChatHud().addMessage(modifiedMessage);
-                }
-            });
             return false;
+        });
+
+        ClientReceiveMessageEvents.MODIFY_GAME.register((message, overlay) -> {
+            MinecraftClient client = MinecraftClient.getInstance();
+
+            String originalMessage = message.getString();
+            UUID messageId = UUID.randomUUID();
+            messageCache.put(messageId, originalMessage);
+            if (messageCache.size() > MAX_CACHE_SIZE) {
+                messageCache.remove(messageCache.keySet().iterator().next());
+            }
+
+            MutableText translateButton = Text.literal(" §r[T]")
+                    .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
+                            .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
+                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
+
+            return Text.empty().append(message).append(translateButton);
         });
 
         // Register the translate command.
@@ -69,16 +79,19 @@ public class ManualTranslateListener implements ClientModInitializer {
                     ClientCommandManager.literal("translate-message")
                             .then(ClientCommandManager.argument("messageId", UuidArgumentType.uuid())
                                     .executes(context -> {
+
                                         if ("your-gemini-api-key-here".equals(config.geminiApiKey)) {
                                             MinecraftClient.getInstance().inGameHud.getChatHud()
                                                     .addMessage(Text.of("[Translator] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
                                             return 1;
                                         }
+
                                         if ("not-set".equals(config.chatTranslatorLang)) {
                                             MinecraftClient.getInstance().inGameHud.getChatHud()
                                                     .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
                                             return 1;
                                         }
+
                                         UUID messageId = context.getArgument("messageId", UUID.class);
                                         String originalMessage = messageCache.get(messageId);
 
