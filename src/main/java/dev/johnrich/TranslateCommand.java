@@ -30,7 +30,7 @@ public class TranslateCommand implements ClientModInitializer {
             if (message.equals(".setlang") || message.startsWith(".setlang ")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
-                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cUsage: .setlang <command|manual|both> <lang>"));
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cUsage: .setlang <command|chat|both> <lang>"));
                     return false;
                 }
 
@@ -39,13 +39,13 @@ public class TranslateCommand implements ClientModInitializer {
 
                 switch (target) {
                     case "command" -> config.commandLang = lang;
-                    case "manual" -> config.chatTranslatorLang = lang;
+                    case "chat" -> config.chatTranslatorLang = lang;
                     case "both" -> {
                         config.commandLang = lang;
                         config.chatTranslatorLang = lang;
                     }
                     default -> {
-                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cInvalid target. Use command/manual/both."));
+                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cInvalid target. Use command/chat/both."));
                         return false;
                     }
                 }
