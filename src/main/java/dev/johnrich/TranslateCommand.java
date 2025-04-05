@@ -27,7 +27,7 @@ public class TranslateCommand implements ClientModInitializer {
                 return false;
             }
 
-            if (message.startsWith(".setlang")) {
+            if (message.equals(".setlang") || message.startsWith(".setlang")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[Translator] §cUsage: .setlang <command|manual|both> <lang>"));
@@ -56,7 +56,7 @@ public class TranslateCommand implements ClientModInitializer {
                 return false;
             }
 
-            if (message.startsWith(".setkey ")) {
+            if (message.equals(".setkey") || message.startsWith(".setkey ")) {
                 String[] parts = message.split(" ", 2);
                 if (parts.length < 2 || parts[1].isBlank()) {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
@@ -85,7 +85,7 @@ public class TranslateCommand implements ClientModInitializer {
                 String lang = config.commandLang;
 
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §7Translating to " + lang + "..."));
+                        .addMessage(Text.of("[Translator] §eTranslating to &6" + lang + "&e..."));
 
                 translationService.translate(lang, textToTranslate).thenAccept(translatedText -> {
                     MinecraftClient.getInstance().execute(() -> {
