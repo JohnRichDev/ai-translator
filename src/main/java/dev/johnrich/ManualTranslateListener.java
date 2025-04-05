@@ -16,6 +16,7 @@ import net.minecraft.util.Formatting;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 public class ManualTranslateListener implements ClientModInitializer {
     private AITranslationService translationService;
@@ -28,8 +29,14 @@ public class ManualTranslateListener implements ClientModInitializer {
     private static final int MAX_CACHE_SIZE = 100;
     private TranslatorConfig config;
 
+    private static final Pattern TEXT_CONTENT_PATTERN = Pattern.compile("[\\p{L}\\p{N}\\p{P}]+");
+
     private String sanitizeForMinecraft(String input) {
         return input.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
+    }
+
+    private boolean isValidForTranslation(String message) {
+        return message != null && !message.trim().isEmpty() && TEXT_CONTENT_PATTERN.matcher(message).find();
     }
 
     @Override
@@ -44,34 +51,43 @@ public class ManualTranslateListener implements ClientModInitializer {
             MinecraftClient client = MinecraftClient.getInstance();
 
             String originalMessage = message.getString();
-            UUID messageId = UUID.randomUUID();
-            messageCache.put(messageId, originalMessage);
-            if (messageCache.size() > MAX_CACHE_SIZE) {
-                messageCache.remove(messageCache.keySet().iterator().next());
+            if (isValidForTranslation(originalMessage)) {
+                UUID messageId = UUID.randomUUID();
+                messageCache.put(messageId, originalMessage);
+                if (messageCache.size() > MAX_CACHE_SIZE) {
+                    messageCache.remove(messageCache.keySet().iterator().next());
+                }
+
+                MutableText translateButton = Text.literal(" §r[T]")
+                        .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
+                                .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
+                MutableText modifiedMessage = Text.empty().append(message).append(translateButton);
+                client.inGameHud.getChatHud().addMessage(modifiedMessage);
+
+                return false;
+            } else {
+                client.inGameHud.getChatHud().addMessage(message);
+                return false;
             }
-
-            MutableText translateButton = Text.literal(" §r[T]")
-                    .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
-                            .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
-            MutableText modifiedMessage = Text.empty().append(message).append(translateButton);
-            client.inGameHud.getChatHud().addMessage(modifiedMessage);
-
-            return false;
         });
 
         ClientReceiveMessageEvents.MODIFY_GAME.register((message, overlay) -> {
             String originalMessage = message.getString();
-            UUID messageId = UUID.randomUUID();
+            if (isValidForTranslation(originalMessage)) {
+                UUID messageId = UUID.randomUUID();
 
-            messageCache.put(messageId, originalMessage);
+                messageCache.put(messageId, originalMessage);
 
-            MutableText translateButton = Text.literal(" §r[T]")
-                    .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
-                            .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
-                            .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
+                MutableText translateButton = Text.literal(" §r[T]")
+                        .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
+                                .withClickEvent(new ClickEvent.RunCommand("/translate-message " + messageId))
+                                .withHoverEvent(new HoverEvent.ShowText(Text.literal("Click to translate this message"))));
 
-            return Text.empty().append(message).append(translateButton);
+                return Text.empty().append(message).append(translateButton);
+            } else {
+                return message;
+            }
         });
 
         // Register the translate command.
