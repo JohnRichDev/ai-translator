@@ -13,13 +13,18 @@ import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
 public class ManualTranslateListener implements ClientModInitializer {
     private AITranslationService translationService;
-    private final Map<UUID, String> messageCache = new HashMap<>();
+    private final Map<UUID, String> messageCache = new LinkedHashMap<UUID, String>() {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<UUID, String> eldest) {
+            return size() > MAX_CACHE_SIZE;
+        }
+    };
     private static final int MAX_CACHE_SIZE = 100;
     private TranslatorConfig config;
 
@@ -56,14 +61,10 @@ public class ManualTranslateListener implements ClientModInitializer {
         });
 
         ClientReceiveMessageEvents.MODIFY_GAME.register((message, overlay) -> {
-            MinecraftClient client = MinecraftClient.getInstance();
-
             String originalMessage = message.getString();
             UUID messageId = UUID.randomUUID();
+
             messageCache.put(messageId, originalMessage);
-            if (messageCache.size() > MAX_CACHE_SIZE) {
-                messageCache.remove(messageCache.keySet().iterator().next());
-            }
 
             MutableText translateButton = Text.literal(" §r[T]")
                     .setStyle(Style.EMPTY.withColor(Formatting.GREEN)
