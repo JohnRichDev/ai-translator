@@ -14,14 +14,19 @@ public class TranslateCommand implements ClientModInitializer {
         translationService = new AITranslationService();
         config = TranslatorConfig.load();
 
-        MinecraftClient.getInstance().execute(() -> {
-            if ("en".equals(config.commandLang)) {
-                MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §eUsing default translation language (English). Use §a.setlang command <lang> §eto change."));
-            }
-        });
-
         ClientSendMessageEvents.ALLOW_CHAT.register((message) -> {
+            if ("not-set".equals(config.commandLang)) {
+                MinecraftClient.getInstance().inGameHud.getChatHud()
+                        .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
+                return false;
+            }
+
+            if ("your-gemini-api-key-here".equals(config.geminiApiKey)) {
+                MinecraftClient.getInstance().inGameHud.getChatHud()
+                        .addMessage(Text.of("[Translator] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
+                return false;
+            }
+
             if (message.startsWith(".setlang")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
@@ -51,7 +56,28 @@ public class TranslateCommand implements ClientModInitializer {
                 return false;
             }
 
-            if (message.startsWith(".t ") || message.startsWith(".translate ")) {
+            if (message.startsWith(".setkey ")) {
+                String[] parts = message.split(" ", 2);
+                if (parts.length < 2 || parts[1].isBlank()) {
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                            Text.of("[Translator] §cUsage: .setkey <your-api-key>"));
+                    return false;
+                }
+
+                config.geminiApiKey = parts[1].trim();
+                config.save();
+
+                MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
+                        Text.of("[Translator] §aGemini API key updated successfully."));
+                return false;
+            }
+
+            if ((message.equals(".t") || message.equals(".translate")) || (message.startsWith(".t ") || message.startsWith(".translate "))) {
+                if ("not-set".equals(config.commandLang)) {
+                    MinecraftClient.getInstance().inGameHud.getChatHud()
+                            .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
+                    return false;
+                }
                 String[] parts = message.split(" ", 2);
                 if (parts.length < 2) return false;
 
