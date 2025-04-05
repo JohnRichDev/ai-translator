@@ -34,9 +34,13 @@ public class ManualTranslateListener implements ClientModInitializer {
 
         System.out.println("[Translator] Translator listener initialized");
 
-        // Intercept all incoming chat messages, regardless of sender.
+        // Intercept all incoming chat messages.
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
             MinecraftClient client = MinecraftClient.getInstance();
+
+            if (sender.getId().equals(client.player.getUuid())) {
+                return true;
+            }
 
             String originalMessage = message.getString();
             UUID messageId = UUID.randomUUID();
