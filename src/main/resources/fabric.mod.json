@@ -1,0 +1,38 @@
+{
+	"schemaVersion": 1,
+	"id": "ai-translator",
+	"version": "${version}",
+	"name": "AI Translator",
+	"description": "Uses AI to translate messages into any languages (even fictional). NOTE: Some translations are not accurate.",
+	"authors": [
+		"JohnRich (johnrich.dev)"
+	],
+	"contact": {
+		"homepage": "https://johnrich.dev/",
+		"sources": "https://github.com/johnrichdev"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/ai-translator/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+		],
+		"client": [
+			"dev.johnrich.TranslatorModClient",
+			"dev.johnrich.TranslateCommand",
+			"dev.johnrich.ManualTranslateListener"
+		]
+	},
+	"mixins": [
+		"ai-translator.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.12",
+		"minecraft": "~1.21.5",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
