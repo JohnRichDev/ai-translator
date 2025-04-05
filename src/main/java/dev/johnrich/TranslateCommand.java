@@ -27,7 +27,7 @@ public class TranslateCommand implements ClientModInitializer {
                 return false;
             }
 
-            if (message.equals(".setlang") || message.startsWith(".setlang")) {
+            if (message.equals(".setlang") || message.startsWith(".setlang ")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[Translator] §cUsage: .setlang <command|manual|both> <lang>"));
@@ -73,11 +73,6 @@ public class TranslateCommand implements ClientModInitializer {
             }
 
             if ((message.equals(".t") || message.equals(".translate")) || (message.startsWith(".t ") || message.startsWith(".translate "))) {
-                if ("not-set".equals(config.commandLang)) {
-                    MinecraftClient.getInstance().inGameHud.getChatHud()
-                            .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
-                    return false;
-                }
                 String[] parts = message.split(" ", 2);
                 if (parts.length < 2) return false;
 
@@ -85,7 +80,7 @@ public class TranslateCommand implements ClientModInitializer {
                 String lang = config.commandLang;
 
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §eTranslating to &6" + lang + "&e..."));
+                        .addMessage(Text.of("[Translator] §eTranslating to §6" + lang + "§e..."));
 
                 translationService.translate(lang, textToTranslate).thenAccept(translatedText -> {
                     MinecraftClient.getInstance().execute(() -> {
