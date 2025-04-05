@@ -41,7 +41,7 @@ public class AITranslationService {
         String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" +
                 config.geminiModelId + ":generateContent?key=" + config.geminiApiKey;
 
-        JsonObject requestBody = buildManualRequestBody(language, message);
+        JsonObject requestBody = buildChatTranslatorRequestBody(language, message);
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(endpoint))
@@ -53,14 +53,14 @@ public class AITranslationService {
                 .thenApply(HttpResponse::body)
                 .thenApply(this::parseResponse);
     }
-    private JsonObject buildManualRequestBody(String language, String message) {
+    private JsonObject buildChatTranslatorRequestBody(String language, String message) {
         JsonObject requestBody = new JsonObject();
         JsonArray contents = new JsonArray();
         JsonObject content = new JsonObject();
 
         JsonArray parts = new JsonArray();
         JsonObject textPart = new JsonObject();
-        textPart.addProperty("text", "Translate this to \"" + language + "\" and make sure to keep it concise and short: " + message);
+        textPart.addProperty("text", "Translate this to \"" + language + "\" and make sure to keep it concise (remove the user's prefixes and suffixes before the message): " + message);
 
         parts.add(textPart);
         content.add("parts", parts);

@@ -17,20 +17,20 @@ public class TranslateCommand implements ClientModInitializer {
         ClientSendMessageEvents.ALLOW_CHAT.register((message) -> {
             if ("not-set".equals(config.commandLang)) {
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
+                        .addMessage(Text.of("[T] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
                 return false;
             }
 
             if ("your-gemini-api-key-here".equals(config.geminiApiKey)) {
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
+                        .addMessage(Text.of("[T] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
                 return false;
             }
 
             if (message.equals(".setlang") || message.startsWith(".setlang ")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
-                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[Translator] §cUsage: .setlang <command|manual|both> <lang>"));
+                    MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cUsage: .setlang <command|manual|both> <lang>"));
                     return false;
                 }
 
@@ -45,14 +45,14 @@ public class TranslateCommand implements ClientModInitializer {
                         config.chatTranslatorLang = lang;
                     }
                     default -> {
-                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[Translator] §cInvalid target. Use command/manual/both."));
+                        MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.of("[T] §cInvalid target. Use command/manual/both."));
                         return false;
                     }
                 }
 
                 config.save();
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §aLanguage updated for: " + target));
+                        .addMessage(Text.of("[T] §aLanguage updated for: " + target));
                 return false;
             }
 
@@ -60,7 +60,7 @@ public class TranslateCommand implements ClientModInitializer {
                 String[] parts = message.split(" ", 2);
                 if (parts.length < 2 || parts[1].isBlank()) {
                     MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
-                            Text.of("[Translator] §cUsage: .setkey <your-api-key>"));
+                            Text.of("[T] §cUsage: .setkey <your-api-key>"));
                     return false;
                 }
 
@@ -68,7 +68,7 @@ public class TranslateCommand implements ClientModInitializer {
                 config.save();
 
                 MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(
-                        Text.of("[Translator] §aGemini API key updated successfully."));
+                        Text.of("[T] §aGemini API key updated successfully."));
                 return false;
             }
 
@@ -80,14 +80,14 @@ public class TranslateCommand implements ClientModInitializer {
                 String lang = config.commandLang;
 
                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                        .addMessage(Text.of("[Translator] §eTranslating to §6" + lang + "§e..."));
+                        .addMessage(Text.of("[T] §eTranslating to §6" + lang + "§e..."));
 
                 translationService.translate(lang, textToTranslate).thenAccept(translatedText -> {
                     MinecraftClient.getInstance().execute(() -> {
                         if (MinecraftClient.getInstance().player != null) {
                             if (MinecraftClient.getInstance().isInSingleplayer()) {
                                 MinecraftClient.getInstance().inGameHud.getChatHud()
-                                        .addMessage(Text.of("§a[Translator] §r" + translatedText));
+                                        .addMessage(Text.of("§a[T] §r" + translatedText));
                             } else {
                                 String sanitizedText = translatedText.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
                                 MinecraftClient.getInstance().player.networkHandler

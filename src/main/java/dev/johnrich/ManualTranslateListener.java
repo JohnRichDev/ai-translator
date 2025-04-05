@@ -32,7 +32,7 @@ public class ManualTranslateListener implements ClientModInitializer {
         translationService = new AITranslationService();
         config = TranslatorConfig.load();
 
-        System.out.println("[Translator] Translator listener initialized");
+        System.out.println("[T] Translator listener initialized");
 
         // Intercept all incoming messages.
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signedMessage, sender, params, receptionTimestamp) -> {
@@ -82,13 +82,13 @@ public class ManualTranslateListener implements ClientModInitializer {
 
                                         if ("your-gemini-api-key-here".equals(config.geminiApiKey)) {
                                             MinecraftClient.getInstance().inGameHud.getChatHud()
-                                                    .addMessage(Text.of("[Translator] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
+                                                    .addMessage(Text.of("[T] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
                                             return 1;
                                         }
 
                                         if ("not-set".equals(config.chatTranslatorLang)) {
                                             MinecraftClient.getInstance().inGameHud.getChatHud()
-                                                    .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
+                                                    .addMessage(Text.of("[T] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
                                             return 1;
                                         }
 
@@ -97,7 +97,7 @@ public class ManualTranslateListener implements ClientModInitializer {
 
                                         if (originalMessage == null) {
                                             MinecraftClient client = MinecraftClient.getInstance();
-                                            client.inGameHud.getChatHud().addMessage(Text.of("[Translator] §cTranslate Error: Message not found in cache"));
+                                            client.inGameHud.getChatHud().addMessage(Text.of("[T] §cTranslate Error: Message not found in cache"));
                                             return 1;
                                         }
 
@@ -110,7 +110,7 @@ public class ManualTranslateListener implements ClientModInitializer {
                                                     client.execute(() -> {
                                                         if (client.inGameHud != null) {
                                                             String sanitizedText = sanitizeForMinecraft(translatedText);
-                                                            Text translatedMessage = Text.literal("[Translator] ")
+                                                            Text translatedMessage = Text.literal("[T] ")
                                                                     .formatted(Formatting.GREEN)
                                                                     .append(Text.literal(sanitizedText).formatted(Formatting.WHITE));
 
@@ -120,7 +120,7 @@ public class ManualTranslateListener implements ClientModInitializer {
                                                 }).exceptionally(ex -> {
                                                     MinecraftClient.getInstance().execute(() -> {
                                                         MinecraftClient client = MinecraftClient.getInstance();
-                                                        client.inGameHud.getChatHud().addMessage(Text.of("[Translator] §cTranslate Error: " + ex.getMessage()));
+                                                        client.inGameHud.getChatHud().addMessage(Text.of("[T] §cTranslate Error: " + ex.getMessage()));
                                                     });
                                                     return null;
                                                 });
