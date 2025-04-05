@@ -69,6 +69,16 @@ public class ManualTranslateListener implements ClientModInitializer {
                     ClientCommandManager.literal("translate-message")
                             .then(ClientCommandManager.argument("messageId", UuidArgumentType.uuid())
                                     .executes(context -> {
+                                        if ("your-gemini-api-key-here".equals(config.geminiApiKey)) {
+                                            MinecraftClient.getInstance().inGameHud.getChatHud()
+                                                    .addMessage(Text.of("[Translator] §cGemini API key is not set! §eUse §a.setkey <your-api-key> §eto set it."));
+                                            return 1;
+                                        }
+                                        if ("not-set".equals(config.chatTranslatorLang)) {
+                                            MinecraftClient.getInstance().inGameHud.getChatHud()
+                                                    .addMessage(Text.of("[Translator] §cTranslation language is not set! §eUse §a.setlang command <lang> §eto change."));
+                                            return 1;
+                                        }
                                         UUID messageId = context.getArgument("messageId", UUID.class);
                                         String originalMessage = messageCache.get(messageId);
 
