@@ -20,7 +20,7 @@
 		"client": [
 			"dev.johnrich.TranslatorModClient",
 			"dev.johnrich.TranslateCommand",
-			"dev.johnrich.ManualTranslateListener"
+			"dev.johnrich.ChatTranslatorListener"
 		]
 	},
 	"mixins": [
