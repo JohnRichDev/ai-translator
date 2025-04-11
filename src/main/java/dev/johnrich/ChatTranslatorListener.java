@@ -17,6 +17,7 @@ public class ChatTranslatorListener implements ClientModInitializer {
             return size() > 100;
         }
     };
+    
     public static TranslatorConfig config;
 
     public static String sanitizeForMinecraft(String input) {

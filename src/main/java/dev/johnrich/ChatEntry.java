@@ -4,7 +4,7 @@ import net.minecraft.text.Text;
 
 public class ChatEntry {
     private final Text original;
-    private Text translated;
+    private  Text translated;
 
     public ChatEntry(Text original) {
         this.original = original;
