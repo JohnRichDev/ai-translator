@@ -27,6 +27,8 @@ public class TranslateCommand implements ClientModInitializer {
                 return false;
             }
 
+            config = TranslatorConfig.load();
+
             if (message.equals(".setlang") || message.startsWith(".setlang ")) {
                 String[] parts = message.split(" ");
                 if (parts.length != 3) {
@@ -82,20 +84,18 @@ public class TranslateCommand implements ClientModInitializer {
                 MinecraftClient.getInstance().inGameHud.getChatHud()
                         .addMessage(Text.of("[T] §eTranslating to §6" + lang + "§e..."));
 
-                translationService.translate(lang, textToTranslate).thenAccept(translatedText -> {
-                    MinecraftClient.getInstance().execute(() -> {
-                        if (MinecraftClient.getInstance().player != null) {
-                            if (MinecraftClient.getInstance().isInSingleplayer()) {
-                                MinecraftClient.getInstance().inGameHud.getChatHud()
-                                        .addMessage(Text.of("§a[T] §r" + translatedText));
-                            } else {
-                                String sanitizedText = translatedText.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
-                                MinecraftClient.getInstance().player.networkHandler
-                                        .sendChatMessage(sanitizedText);
-                            }
+                translationService.translate(lang, textToTranslate).thenAccept(translatedText -> MinecraftClient.getInstance().execute(() -> {
+                    if (MinecraftClient.getInstance().player != null) {
+                        if (MinecraftClient.getInstance().isInSingleplayer()) {
+                            MinecraftClient.getInstance().inGameHud.getChatHud()
+                                    .addMessage(Text.of("§a[T] §r" + translatedText));
+                        } else {
+                            String sanitizedText = translatedText.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
+                            MinecraftClient.getInstance().player.networkHandler
+                                    .sendChatMessage(sanitizedText);
                         }
-                    });
-                });
+                    }
+                }));
                 return false;
             }
 
@@ -109,20 +109,18 @@ public class TranslateCommand implements ClientModInitializer {
                 MinecraftClient.getInstance().inGameHud.getChatHud()
                         .addMessage(Text.of("[T] §eTranslating to §6" + lang + "§e..."));
 
-                translationService.translate(lang, textToTranslate).thenAccept(translatedText -> {
-                    MinecraftClient.getInstance().execute(() -> {
-                        if (MinecraftClient.getInstance().player != null) {
-                            if (MinecraftClient.getInstance().isInSingleplayer()) {
-                                MinecraftClient.getInstance().inGameHud.getChatHud()
-                                        .addMessage(Text.of("§a[T] §r" + translatedText));
-                            } else {
-                                String sanitizedText = translatedText.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
-                                MinecraftClient.getInstance().player.networkHandler
-                                        .sendChatMessage(sanitizedText);
-                            }
+                translationService.translate(lang, textToTranslate).thenAccept(translatedText -> MinecraftClient.getInstance().execute(() -> {
+                    if (MinecraftClient.getInstance().player != null) {
+                        if (MinecraftClient.getInstance().isInSingleplayer()) {
+                            MinecraftClient.getInstance().inGameHud.getChatHud()
+                                    .addMessage(Text.of("§a[T] §r" + translatedText));
+                        } else {
+                            String sanitizedText = translatedText.replaceAll("[^\\x20-\\x7E\\p{L}\\p{N}\\p{P}\\p{Z}]", "");
+                            MinecraftClient.getInstance().player.networkHandler
+                                    .sendChatMessage(sanitizedText);
                         }
-                    });
-                });
+                    }
+                }));
                 return false;
             }
 
