@@ -92,10 +92,10 @@ public class AITranslationService {
             JsonObject response = gson.fromJson(jsonResponse, JsonObject.class);
 
             JsonArray candidates = response.getAsJsonArray("candidates");
-            if (candidates != null && candidates.size() > 0) {
+            if (candidates != null && !candidates.isEmpty()) {
                 JsonObject content = candidates.get(0).getAsJsonObject().getAsJsonObject("content");
                 JsonArray parts = content.getAsJsonArray("parts");
-                if (parts != null && parts.size() > 0) {
+                if (parts != null && !parts.isEmpty()) {
                     return parts.get(0).getAsJsonObject().get("text").getAsString();
                 }
             }
